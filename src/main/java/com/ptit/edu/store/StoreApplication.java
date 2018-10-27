@@ -13,7 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-@ComponentScan({"com.ptit.edu.store"})
 public class StoreApplication {
 
 	@Bean

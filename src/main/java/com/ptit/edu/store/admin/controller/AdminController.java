@@ -32,7 +32,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.print.Doc;
 import javax.validation.constraints.Null;
 import java.io.FileInputStream;
@@ -46,7 +45,7 @@ import java.util.*;
 public class AdminController {
     @Autowired
     StoreBranchRepository storeBranchRepository;
-    @PersistenceContext
+    @Autowired
     EntityManager entityManager;
     @Autowired
     CategoryRepository categoryRepository;

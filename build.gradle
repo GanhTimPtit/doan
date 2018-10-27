@@ -47,6 +47,9 @@ dependencies {
     compile "org.apache.poi:poi:3.17"
     compile "org.apache.poi:poi-ooxml:3.17"
     compile "org.jsoup:jsoup:1.8.3"
+
+    compile "javax.xml.bind:jaxb-api:2.3.0"
+    compile "org.glassfish.jaxb:jaxb-runtime"
     // https://mvnrepository.com/artifact/net.sf.supercsv/super-csv
     compile group: 'net.sf.supercsv', name: 'super-csv', version: '2.4.0'
 

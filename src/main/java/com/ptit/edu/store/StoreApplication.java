@@ -24,18 +24,16 @@ public class StoreApplication {
 		return new RestTemplate();
 	}
 
-
-
-	@Bean
-	public static PropertyPlaceholderConfigurer properties() {
-		PropertyPlaceholderConfigurer ppc
-				= new PropertyPlaceholderConfigurer();
-		Resource[] resources = new ClassPathResource[]
-				{ new ClassPathResource( "validator.properties" ) };
-		ppc.setLocations( resources );
-		ppc.setIgnoreUnresolvablePlaceholders( true );
-		return ppc;
-	}
+//	@Bean
+//	public static PropertyPlaceholderConfigurer properties() {
+//		PropertyPlaceholderConfigurer ppc
+//				= new PropertyPlaceholderConfigurer();
+//		Resource[] resources = new ClassPathResource[]
+//				{ new ClassPathResource( "validator.properties" ) };
+//		ppc.setLocations( resources );
+//		ppc.setIgnoreUnresolvablePlaceholders( true );
+//		return ppc;
+//	}
 	public static void main(String[] args) {
 		SpringApplication.run(StoreApplication.class, args);
 	}

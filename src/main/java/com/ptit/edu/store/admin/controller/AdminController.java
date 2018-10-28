@@ -235,7 +235,7 @@ public class AdminController {
             Sort sort = PageAndSortRequestBuilder.createSortRequest(sortBy, sortType);
             List<StoreBranchViewModel> lsBranch = storeBranchRepository.getStoreBranchViewModel(sort);
             for (StoreBranchViewModel storeBranchViewModel : lsBranch) {
-                if (latLngBody != null) {
+                if (latLngBody!=null && latLngBody.getLat()!=-1 && latLngBody.getLng()!=-1) {
                     storeBranchViewModel.setDistance(distance(storeBranchViewModel.getLat(), storeBranchViewModel.getLng(),
                             latLngBody.getLat(), latLngBody.getLng()));
                 } else {

@@ -136,7 +136,6 @@ public class ProductController {
         if (clothes == null) {
             return new NotFoundResponse("Clothes not Exist");
         }
-
         Sort sort =
                 PageAndSortRequestBuilder.createSortRequest(sortBy, sortType);
         List<RateClothesViewModel> rateClothesViewModels = rateClothesRepository.getAllRate(clothesID, sort);

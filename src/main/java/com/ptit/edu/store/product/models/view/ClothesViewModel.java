@@ -7,6 +7,7 @@ import com.ptit.edu.store.product.models.data.RateClothes;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ClothesViewModel {
@@ -14,10 +15,10 @@ public class ClothesViewModel {
     private String name;
     private int price;
     private String description;
-    private Date createdDate;
+    private long createdDate;
     private String logoUrl;
     private Category category;
-    private Set<RateClothesViewModel> rateClothesViewModels;
+    private List<RateClothesViewModel> rateClothesViewModels;
     private int numberSave;
     private boolean isSaved;
     private float avarageOfRate = 0;
@@ -25,37 +26,31 @@ public class ClothesViewModel {
     public ClothesViewModel() {
     }
 
-    public ClothesViewModel(Clothes clothes) {
-        this.id = clothes.getId();
-        this.name = clothes.getName();
-        this.price = clothes.getPrice();
-        this.description = clothes.getDescription();
-        this.createdDate = clothes.getCreatedDate();
-        this.logoUrl = clothes.getLogoUrl();
-        this.category = clothes.getCategory();
-        this.rateClothesViewModels = new HashSet<>();
-        for (RateClothes rateClothes : clothes.getRateClothes()) {
-            this.rateClothesViewModels.add(new RateClothesViewModel(rateClothes));
-        }
+    public ClothesViewModel(String id, String name, int price, String description, String logoUrl, Category category, int numberSave) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.description = description;
+        this.logoUrl = logoUrl;
+        this.category = category;
+        this.numberSave = numberSave;
         this.isSaved = false;
-        this.numberSave = clothes.getTotalSave();
-        setAvarageOfRate(getAvarageOfRate(clothes));
     }
 
     public float getAvarageOfRate() {
         return avarageOfRate;
     }
 
-    public float getAvarageOfRate(Clothes clothes) {
-        if(clothes.getRateClothes().size()==0){
+    public float getAvarageOfRate(List<RateClothesViewModel> rateClothesSet) {
+        if(rateClothesSet.size()==0){
             return 0;
         }
         int sum = 0;
-        for (RateClothes rateClothes : clothes.getRateClothes()) {
+        for (RateClothesViewModel rateClothes : rateClothesSet) {
             sum += rateClothes.getRating();
         }
 
-        return (float) sum / clothes.getRateClothes().size();
+        return (float) sum / rateClothesSet.size();
     }
 
     public void setAvarageOfRate(float avarageOfRate) {
@@ -102,11 +97,11 @@ public class ClothesViewModel {
         this.numberSave = numberSave;
     }
 
-    public Date getCreatedDate() {
+    public long getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(long createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -134,11 +129,12 @@ public class ClothesViewModel {
         this.category = category;
     }
 
-    public Set<RateClothesViewModel> getRateClothesViewModels() {
+    public List<RateClothesViewModel> getRateClothesViewModels() {
         return rateClothesViewModels;
     }
 
-    public void setRateClothesViewModels(Set<RateClothesViewModel> rateClothesViewModels) {
+    public void setRateClothesViewModels(List<RateClothesViewModel> rateClothesViewModels) {
         this.rateClothesViewModels = rateClothesViewModels;
+        setAvarageOfRate(getAvarageOfRate(rateClothesViewModels));
     }
 }

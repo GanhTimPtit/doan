@@ -14,14 +14,14 @@ public class ItemPreview {
     public ItemPreview() {
     }
 
-    public ItemPreview(Item item) {
-        this.clothesID = item.getClothes().getId();
-        this.logoUrl = item.getClothes().getLogoUrl();
-        this.name = item.getClothes().getName();
-        this.color = item.getColor();
-        this.size = item.getSize();
-        this.amount = item.getAmount();
-        this.price = item.getPrice();
+    public ItemPreview(String clothesID, String logoUrl, String name, String color, String size, int amount, int price) {
+        this.clothesID = clothesID;
+        this.logoUrl = logoUrl;
+        this.name = name;
+        this.color = color;
+        this.size = size;
+        this.amount = amount;
+        this.price = price;
     }
 
     public String getClothesID() {

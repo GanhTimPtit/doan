@@ -1,8 +1,6 @@
 package com.ptit.edu.store.product.controller;
 
-import com.ptit.edu.store.product.dao.RecommendItemRepository;
 import com.ptit.edu.store.auth.dao.UserRepository;
-import com.ptit.edu.store.product.models.data.RecommendItem;
 import com.ptit.edu.store.constants.Constant;
 import com.ptit.edu.store.customer.dao.CustomerRespository;
 import com.ptit.edu.store.customer.dao.SaveClothesRepository;
@@ -23,8 +21,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/products")
@@ -44,8 +43,7 @@ public class ProductController {
     private CustomerRespository customerRespository;
     @Autowired
     private RateClothesRepository rateClothesRepository;
-    @Autowired
-    private RecommendItemRepository recommendItemRepository;
+
     @Autowired
     private RecommendClothesRepository recommendClothesRepository;
 
@@ -232,6 +230,9 @@ public class ProductController {
                 return new NotFoundResponse("Clothes not Exist");
             }
             ClothesViewModel clothesViewModel = clothesRepository.getClothesViewModel(clothesID);
+            Sort sort =
+                    PageAndSortRequestBuilder.createSortRequest(RateClothes.RATE_DATE, "desc");
+            clothesViewModel.setRateClothesViewModels(rateClothesRepository.getAllRate(clothesID, sort));
             response = new OkResponse(clothesViewModel);
         } catch (Exception e) {
             e.printStackTrace();
@@ -259,7 +260,7 @@ public class ProductController {
                 return new NotFoundResponse("Clothes not Exist");
             }
             Pageable pageable = PageAndSortRequestBuilder.createPageRequest(pageIndex, pageSize, sortBy, sortType, Constant.MAX_PAGE_SIZE);
-            Page<ClothesPreview> clothesPreviews = clothesRepository.getSimilarClothesPreviews(pageable, clothes.getCategory().getId());
+            Page<ClothesPreview> clothesPreviews = clothesRepository.getSimilarClothesPreviews(pageable, clothes.getCategory().getId(), clothesID);
             response = new OkResponse(clothesPreviews);
         } catch (Exception e) {
             e.printStackTrace();

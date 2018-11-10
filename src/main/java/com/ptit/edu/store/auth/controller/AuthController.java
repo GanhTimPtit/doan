@@ -5,7 +5,6 @@ import com.ptit.edu.store.admin.dao.AdminRepository;
 import com.ptit.edu.store.admin.models.data.Admin;
 import com.ptit.edu.store.admin.models.body.AdminRegisterBody;
 import com.ptit.edu.store.product.dao.RecommendClothesRepository;
-import com.ptit.edu.store.product.dao.RecommendItemRepository;
 import com.ptit.edu.store.auth.dao.UserRepository;
 import com.ptit.edu.store.auth.models.body.CustomerRegisterBody;
 import com.ptit.edu.store.auth.models.body.FacebookLoginBody;
@@ -24,7 +23,6 @@ import com.ptit.edu.store.product.models.body.RateClothesBody;
 import com.ptit.edu.store.product.models.data.Clothes;
 import com.ptit.edu.store.product.models.data.RateClothes;
 import com.ptit.edu.store.product.models.data.RecommendClothes;
-import com.ptit.edu.store.product.models.data.RecommendItem;
 import com.ptit.edu.store.response_model.*;
 import com.ptit.edu.store.utils.*;
 import io.swagger.annotations.*;
@@ -77,8 +75,7 @@ public class AuthController {
     RateClothesRepository rateClothesRepository;
     @Autowired
     ClothesRepository clothesRepository;
-    @Autowired
-    RecommendItemRepository recommendItemRepository;
+
 
     @Autowired
     RecommendClothesRepository recommendClothesRepository;
@@ -134,14 +131,6 @@ public class AuthController {
             if (!userRepository.isAccountActivated(user.getUsername(), RoleConstants.CUSTOMER)) {
                 response = new ForbiddenResponse(ResponseConstant.ErrorMessage.ACCOUNT_NOT_VERIFIED);
             } else {
-//                User login = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword());
-//                   if (login != null) {
-//                       Customer customer = customerRespository.findByUser_Id(login.getId());
-//                       HeaderProfile profile = new HeaderProfile(customer.getId(), customer.getFullName(), customer.getAvatarUrl(), user.getUsername());
-//                       response = new OkResponse(profile);
-//                } else {
-//                    response = new Response(HttpStatus.UNAUTHORIZED, ResponseConstant.Vi.WRONG_EMAIL_OR_PASSWORD);
-//                }
                 response = login(user.getUsername(), user.getPassword(), gcmToken);
             }
         } catch (Exception e) {
@@ -151,19 +140,19 @@ public class AuthController {
 
         return response;
     }
+
+
     private Response login(String username, String password,String gcmToken) {
         LinkedMultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "password");
         body.add("username", username);
         body.add("password", password);
-
         JWTToken token = new HttpPostRequestBuilder(restTemplate)
                 .withUrl(ApplicationConstant.LOCAL_HOST + "/oauth/token")
                 .setContentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .addToHeader(HeaderConstant.AUTHORIZATION, HeaderConstant.AUTHORIZATION_VALUE_PREFIX + Base64Utils.encode("trusted-app:secret"))
                 .setFormDataBody(body)
                 .execute(JWTToken.class);
-
 
         LoginResult loginResult = new LoginResult(userRepository.getDataIDWithUsername(username),
                 token.getAccess_token(),
@@ -234,6 +223,7 @@ public class AuthController {
         user.setUsername(username);
         user.setPassword(bCryptPasswordEncoder.encode(username));
         user.setRole(role);
+        user.setActived(true);
         user = userRepository.save(user);
 
         switch (role) {
@@ -258,22 +248,6 @@ public class AuthController {
             }
             break;
 
-        /*    case RoleConstant.EMPLOYER: {
-                Employer employer = new Employer();
-                employer.setUser(user);
-                employer.setEmployerName(facebookUser.getName());
-                if (facebookAvatar != null) {
-                    employer.setLogoUrl(facebookAvatar.getData().getUrl());
-                }
-                FacebookCover facebookCover = facebookUser.getCover();
-                if (facebookCover != null) {
-                    employer.setCoverUrl(facebookCover.getSource());
-                }
-                employer = employerRepository.save(employer);
-                user.setDataID(employer.getId());
-                user = userRepository.save(user);
-            }
-            break;*/
 
             default: {
                 break;
@@ -323,9 +297,11 @@ public class AuthController {
             if (!userRepository.isAccountActivated(user.getUsername(), RoleConstants.ADMIN)) {
                 response = new ForbiddenResponse(ResponseConstant.ErrorMessage.ACCOUNT_NOT_VERIFIED);
             } else {
-                User login = userRepository.findByUsernameAndPassword(user.getUsername(), user.getPassword());
+                User login = userRepository.findByUsernameAndPassword(user.getUsername(),user.getPassword());
+
                 if (login != null) {
-                    response = new OkResponse();
+                    Admin admin= adminRepository.findOne(login.getDataID());
+                    response = new OkResponse(admin.getFullName());
                 } else {
                     response = new Response(HttpStatus.UNAUTHORIZED, ResponseConstant.Vi.WRONG_EMAIL_OR_PASSWORD);
                 }
@@ -339,7 +315,7 @@ public class AuthController {
 
 
     @ApiOperation(value = "Đăng ký tài khoản admin", response = Iterable.class)
-    @PostMapping("/admins/register")
+    @PostMapping("/admin/register")
     public Response adminRegister(@ApiParam(name = HeaderConstant.AUTHORIZATION, value = "username+\":\"+password, lấy kết quả encode theo Base64, sau đó thêm \"Basic \" + kết quả", required = true)
                                   @RequestHeader(value = HeaderConstant.AUTHORIZATION) String encodedString, @ApiParam(name = "adminRegisterBody", value = "Tên đầy đủ KH", required = true)
                                   @Valid @RequestBody AdminRegisterBody adminRegisterBody) {
@@ -359,17 +335,20 @@ public class AuthController {
                 user.setUsername(u.getUsername());
                 user.setRole(RoleConstants.ADMIN);
                 user.setActived(true);
-
-                userRepository.save(user);
-
                 Admin admin = new Admin();
                 admin.setFullName(adminRegisterBody.getFullName());
                 admin.setPosition(adminRegisterBody.getPosition());
-
+                admin.setUser(user);
                 adminRepository.save(admin);
+                admin = adminRepository.save(admin);
+                u = admin.getUser();
+                u.setDataID(admin.getId());
+
+                userRepository.save(u);
+
 
 //                SendEmailUtils.sendEmailrequest(u.getUsername());
-                response = new OkResponse();
+                response = new OkResponse(user.getUsername());
             }
         } catch (Exception e) {
             e.printStackTrace();

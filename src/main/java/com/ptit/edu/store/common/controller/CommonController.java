@@ -64,31 +64,5 @@ public class CommonController {
         }
         return response;
     }
-    /**********************similarClothes********************/
-    @ApiOperation(value = "Lấy danh sách quần áo tưởng đương", response = Iterable.class)
-    @GetMapping("/similarClothes/{id}")
-    public Response getSimilarClothes(@PathVariable("id") String clothesID,
-                                      @ApiParam(name = "pageIndex", value = "index trang, mặc định là 0")
-                                      @RequestParam(value = "pageIndex", defaultValue = "0") Integer pageIndex,
-                                      @ApiParam(name = "pageSize", value = "Kích thước trang, mặc định và tối đa là " + Constant.MAX_PAGE_SIZE)
-                                      @RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                      @ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là " + Clothes.CREATED_DATE)
-                                      @RequestParam(value = "sortBy", defaultValue = Clothes.CREATED_DATE) String sortBy,
-                                      @ApiParam(name = "sortType", value = "Nhận (asc | desc), mặc định là desc")
-                                      @RequestParam(value = "sortType", defaultValue = "desc") String sortType) {
-        Response response;
-        try {
-            Clothes clothes = clothesRepository.findOne(clothesID);
-            if (clothes == null) {
-                return new NotFoundResponse("Clothes not Exist");
-            }
-            Pageable pageable = PageAndSortRequestBuilder.createPageRequest(pageIndex, pageSize, sortBy, sortType, Constant.MAX_PAGE_SIZE);
-            Page<ClothesPreview> clothesPreviews = clothesRepository.getSimilarClothesPreviews(pageable, clothes.getCategory().getId());
-            response = new OkResponse(clothesPreviews);
-        } catch (Exception e) {
-            e.printStackTrace();
-            response = new ServerErrorResponse();
-        }
-        return response;
-    }
+
 }

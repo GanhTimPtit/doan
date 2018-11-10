@@ -15,8 +15,9 @@ import java.util.List;
 public interface RateClothesRepository extends JpaRepository<RateClothes, String>{
     boolean existsByCustomerIdAndClothesId(String customerID, String clothesID);
 
-    @Query("select new com.ptit.edu.store.product.models.view.RateClothesViewModel(r) " +
-            "from RateClothes r where r.clothes.id = ?1")
+    @Query("select new com.ptit.edu.store.product.models.view.RateClothesViewModel(cs.firstName, cs.lastName," +
+            "cs.avatarUrl, r.rateDate, r.message, r.rating) " +
+            "from RateClothes r join r.clothes c join r.customer cs where c.id = ?1")
     List<RateClothesViewModel> getAllRate(String clothesID, Sort pageable);
 
     RateClothes findByClothes_IdAndCustomer_Id(String clothesID,String customerID);

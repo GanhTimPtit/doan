@@ -21,12 +21,13 @@ public class OrderCustomer {
     private String nameCustomer;
     private String phone;
     private String location;
+    private int status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customerID")
     private Customer customer;
 
-    @OneToMany(mappedBy = "orderCustomer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "orderCustomer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Item> items;
 
 
@@ -134,5 +135,13 @@ public class OrderCustomer {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

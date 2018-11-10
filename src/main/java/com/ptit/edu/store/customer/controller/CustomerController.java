@@ -17,6 +17,7 @@ import com.ptit.edu.store.product.models.data.Clothes;
 import com.ptit.edu.store.product.models.data.RateClothes;
 import com.ptit.edu.store.product.models.data.SaveClothes;
 import com.ptit.edu.store.product.models.view.ClothesViewModel;
+import com.ptit.edu.store.product.models.view.RateClothesViewModel;
 import com.ptit.edu.store.response_model.*;
 import com.ptit.edu.store.utils.PageAndSortRequestBuilder;
 import io.swagger.annotations.Api;
@@ -25,6 +26,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -213,6 +215,9 @@ public class CustomerController {
                 return new NotFoundResponse("Clothes not Exist");
             }
             ClothesViewModel clothesViewModel = clothesRepository.getClothesViewModel(clothesID);
+            Sort sort = PageAndSortRequestBuilder.createSortRequest(RateClothes.RATE_DATE, "desc");
+
+            clothesViewModel.setRateClothesViewModels(rateClothesRepository.getAllRate(clothesID, sort));
             clothesViewModel.setIsSaved(saveClothesRepository.existsByCustomer_IdAndClothes_Id(getAuthenticatedCustomerID(), clothesID));
             response = new OkResponse(clothesViewModel);
         } catch (Exception e) {
@@ -361,7 +366,7 @@ public class CustomerController {
                 return new NotFoundResponse("Customer not Exist");
             }
             Pageable pageable = PageAndSortRequestBuilder.createPageRequest(pageIndex, pageSize, "createdDate", sortType, Constant.MAX_PAGE_SIZE);
-            Page<OrderPreview> orderPreviews = orderRepository.getAllOrderPreview(pageable, customer.getId());
+            Page<OrderPreview> orderPreviews = orderRepository.getAllOrderPreview( customer.getId(),pageable);
 
             response = new OkResponse(orderPreviews);
         } catch (Exception e) {

@@ -5,7 +5,7 @@ import com.ptit.edu.store.product.models.data.RateClothes;
 
 import java.util.Date;
 
-public class ClothesPreview {
+public class ClothesPreview implements java.io.Serializable{
     private String id;
     private String name;
     private int price;
@@ -14,18 +14,22 @@ public class ClothesPreview {
     private int numberSave;
     private int numberAvageOfRate;
     private float avarageOfRate = 0;
+
     public ClothesPreview() {
     }
 
-    public ClothesPreview(Clothes clothes) {
-        this.id = clothes.getId();
-        this.name = clothes.getName();
-        this.price = clothes.getPrice();
-        this.logoUrl = clothes.getLogoUrl();
-        this.numberSave = clothes.getTotalSave();
-        this.category= clothes.getCategory().getTitle();
-        setAvarageOfRate(getAvarageOfRate(clothes));
+    public ClothesPreview(String id, String name, int price, String category, String logoUrl, int numberSave, long sumRate, long countRate) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.category = category;
+        this.logoUrl = logoUrl;
+        this.numberSave = numberSave;
+        this.numberAvageOfRate =(int) countRate;
+        this.avarageOfRate = (float) sumRate/countRate ;
     }
+
+
 
     public int getNumberAvageOfRate() {
         return numberAvageOfRate;

@@ -9,7 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item,String> {
-    @Query("select new com.ptit.edu.store.customer.models.view.ItemPreview( o"+
-            ") from Item o where o.orderCustomer.id = ?1 and o.orderCustomer.customer.id= ?2")
+    @Query("select new com.ptit.edu.store.customer.models.view.ItemPreview( c.id," +
+            " c.logoUrl, c.name, o.color, o.size, o.amount, o.price) "+
+            "from Item o join o.orderCustomer oc join o.clothes c where c.id = ?1 and oc.id= ?2")
     List<ItemPreview> getItemPreview(String oderID, String customerID);
+
+    @Query("select new com.ptit.edu.store.customer.models.view.ItemPreview(c.id," +
+            " c.logoUrl, c.name, o.color, o.size, o.amount, o.price) "+
+            "from Item o join o.orderCustomer oc join o.clothes c where oc.id = ?1")
+    List<ItemPreview> getItemPreview(String oderID);
 }

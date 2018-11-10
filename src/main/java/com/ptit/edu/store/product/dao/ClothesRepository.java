@@ -16,18 +16,32 @@ public interface ClothesRepository extends JpaRepository<Clothes, String>{
     Clothes findById(String clothesID);
     List<Clothes> findAllByCategory_Gender(int gender);
 
-    @Query("select new com.ptit.edu.store.product.models.view.ClothesPreview(c) " +
-            " from Clothes c ")
+    @Query("select new com.ptit.edu.store.product.models.view.ClothesPreview(c.id, c.name, c.price, cc.title," +
+            "c.logoUrl, c.totalSave, sum(cr.rating), count(cr.rating)) " +
+            "from Clothes c join c.category cc left join c.rateClothes cr " +
+            "GROUP BY c.id")
     Page<ClothesPreview> getAllClothesPreviews(Pageable pageable);
 
-    @Query("select new com.ptit.edu.store.product.models.view.ClothesPreview(c) " +
-            " from Clothes c where c.category.id= ?1")
+    @Query("select new com.ptit.edu.store.product.models.view.ClothesPreview(c.id, c.name, c.price, cc.title, " +
+            "c.logoUrl, c.totalSave, sum(cr.rating) , count(cr.rating)) " +
+            "from Clothes c join c.category cc left join c.rateClothes cr " +
+            "where cc.id= ?1 " +
+            "GROUP BY c.id")
     Page<ClothesPreview> getAllClothesPreviewsByCategory(Pageable pageable,String categoryID);
 
-    @Query("select new com.ptit.edu.store.product.models.view.ClothesPreview(c) from Clothes c where c.category.id = ?1")
-    Page<ClothesPreview> getSimilarClothesPreviews(Pageable pageable, String categoryID);
+    @Query("select new com.ptit.edu.store.product.models.view.ClothesPreview(c.id, c.name, c.price, cc.title, " +
+            "c.logoUrl, c.totalSave, sum(cr.rating), count(cr.rating)) " +
+            "from Clothes c join c.category cc left join c.rateClothes cr " +
+            "where cc.id = ?1 and c.id <> ?2 "+
+            "GROUP BY c.id")
+    Page<ClothesPreview> getSimilarClothesPreviews(Pageable pageable, String categoryID, String clothesID);
 
-    @Query("select new com.ptit.edu.store.product.models.view.ClothesViewModel(c) from Clothes c where c.id = ?1")
+
+
+    @Query("select new com.ptit.edu.store.product.models.view.ClothesViewModel(c.id, c.name, c.price,c.description," +
+            "c.logoUrl, cc, c.totalSave) " +
+            "from Clothes c join c.category cc " +
+            "where c.id = ?1 ")
     ClothesViewModel getClothesViewModel(String clothesID);
 
     @Query("select c.id from Clothes c")

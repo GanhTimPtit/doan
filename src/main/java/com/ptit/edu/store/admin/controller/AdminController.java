@@ -7,9 +7,19 @@ import com.ptit.edu.store.admin.models.data.StoreBranch;
 import com.ptit.edu.store.admin.models.body.LatLngBody;
 import com.ptit.edu.store.admin.models.body.StoreBranchBody;
 import com.ptit.edu.store.admin.models.view.StoreBranchViewModel;
+import com.ptit.edu.store.constants.Constant;
+import com.ptit.edu.store.customer.dao.CustomerRespository;
+import com.ptit.edu.store.customer.dao.ItemRepository;
+import com.ptit.edu.store.customer.dao.OrderRepository;
+import com.ptit.edu.store.customer.models.data.Customer;
+import com.ptit.edu.store.customer.models.data.OrderCustomer;
+import com.ptit.edu.store.customer.models.view.ConfirmOrderPreview;
+import com.ptit.edu.store.customer.models.view.ItemPreview;
+import com.ptit.edu.store.customer.models.view.OrderPreview;
 import com.ptit.edu.store.product.dao.CategoryRepository;
 import com.ptit.edu.store.product.dao.ClothesRepository;
 import com.ptit.edu.store.product.models.data.Clothes;
+import com.ptit.edu.store.response_model.NotFoundResponse;
 import com.ptit.edu.store.response_model.OkResponse;
 import com.ptit.edu.store.response_model.Response;
 import com.ptit.edu.store.response_model.ServerErrorResponse;
@@ -27,6 +37,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
@@ -53,7 +65,62 @@ public class AdminController {
     ClothesRepository clothesRepository;
     @Autowired
     ApplicationVersionRepository applicationVersionRepository;
+    @Autowired
+    OrderRepository orderRepository;
+    @Autowired
+    ItemRepository itemRepository;
 
+    /**********************xac nhan order********************/
+    @ApiOperation(value = "Lay tat ca cac don dat hang")
+    @GetMapping("/orders")
+    public Response getAllOrder(@ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là : " + OrderCustomer.CREATED_DATE)
+                                @RequestParam(value = "pageIndex", defaultValue = OrderCustomer.CREATED_DATE) String sortBy,
+                                @ApiParam(name = "sortType", value = "Nhận asc|desc, mặc đính là desc")
+                                @RequestParam(value = "pageSize", required = false, defaultValue = "desc") String sortType,
+                                @ApiParam(name = "pageIndex", value = "index trang, mặc định là 0")
+                                @RequestParam(value = "pageIndex", defaultValue = "0") Integer pageIndex,
+                                @ApiParam(name = "pageSize", value = "Kích thước trang, mặc định và tối đa là " + Constant.MAX_PAGE_SIZE)
+                                @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        Response response;
+        try {
+            Pageable pageable = PageAndSortRequestBuilder.createPageRequest(pageIndex, pageSize, "createdDate", sortType, Constant.MAX_PAGE_SIZE);
+            Page<ConfirmOrderPreview> orderPreviews = orderRepository.getAllConfirmOrderPreview(pageable);
+
+            response = new OkResponse(orderPreviews);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response = new ServerErrorResponse();
+        }
+        return response;
+    }
+
+    @ApiOperation(value = "Lay tat ca cac san pham don dat hang")
+    @GetMapping("/orders/{oid}/closthes")
+    public Response getAllOrderProduct(@PathVariable("oid") String orderID) {
+        Response response;
+        try {
+            List<ItemPreview> itemPreviews = itemRepository.getItemPreview(orderID);
+            response = new OkResponse(itemPreviews);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response = new ServerErrorResponse();
+        }
+        return response;
+    }
+    @ApiOperation(value = "xac nhan don dat hang")
+    @PutMapping("/orders/confirm")
+    public Response ConfirmOrder(@RequestBody Set<String> setOrderID ) {
+        Response response;
+        try {
+            orderRepository.updateBillStatus(setOrderID);
+            response = new OkResponse();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response = new ServerErrorResponse();
+        }
+        return response;
+    }
+    /***************************************************************************************************/
     @ApiOperation(value = "thêm một chi nhánh cho công ty", response = Iterable.class)
     @PostMapping("/store_branch")
     Response InsertBranch(@RequestBody StoreBranchBody storeBranchBody) {

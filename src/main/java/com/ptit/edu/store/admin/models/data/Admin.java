@@ -20,7 +20,7 @@ public class Admin {
     private String avatarUrl;
     private String description;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
     @JoinColumn(name = "userID")
     private User user;
 

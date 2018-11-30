@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ptit.edu.store.admin.dao.AdminRepository;
 import com.ptit.edu.store.admin.models.data.Admin;
 import com.ptit.edu.store.admin.models.body.AdminRegisterBody;
+import com.ptit.edu.store.customer.dao.CustomerRepository;
 import com.ptit.edu.store.product.dao.RecommendClothesRepository;
 import com.ptit.edu.store.auth.dao.UserRepository;
 import com.ptit.edu.store.auth.models.body.CustomerRegisterBody;
@@ -15,14 +16,13 @@ import com.ptit.edu.store.auth.models.view.LoginResult;
 import com.ptit.edu.store.constants.ApplicationConstant;
 import com.ptit.edu.store.constants.Constant;
 import com.ptit.edu.store.constants.DataValidator;
-import com.ptit.edu.store.customer.dao.CustomerRespository;
 import com.ptit.edu.store.customer.models.data.Customer;
 import com.ptit.edu.store.product.dao.ClothesRepository;
 import com.ptit.edu.store.product.dao.RateClothesRepository;
 import com.ptit.edu.store.product.models.body.RateClothesBody;
 import com.ptit.edu.store.product.models.data.Clothes;
-import com.ptit.edu.store.product.models.data.RateClothes;
-import com.ptit.edu.store.product.models.data.RecommendClothes;
+import com.ptit.edu.store.product.models.data.Rating;
+import com.ptit.edu.store.product.models.data.ClothesRecommend;
 import com.ptit.edu.store.response_model.*;
 import com.ptit.edu.store.utils.*;
 import io.swagger.annotations.*;
@@ -68,7 +68,7 @@ public class AuthController {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    CustomerRespository customerRespository;
+    CustomerRepository customerRepository;
     @Autowired
     AdminRepository adminRepository;
     @Autowired
@@ -101,7 +101,7 @@ public class AuthController {
                 u.setActived(false);
                 Customer customer = new Customer();
                 customer.updatecontruct(u, customerRegisterBody);
-                customer = customerRespository.save(customer);
+                customer = customerRepository.save(customer);
                 u = customer.getUser();
                 u.setDataID(customer.getId());
 
@@ -187,7 +187,7 @@ public class AuthController {
             user = registerFacebookUser(userID, accessToken, role);
         }
         if (!user.getActived()) {
-            Customer customer = customerRespository.findOne(user.getDataID());
+            Customer customer = customerRepository.findOne(user.getDataID());
             FacebookUserInfo facebookUserInfo = new FacebookUserInfo(customer);
             return new UnAuthorizationResponse(ResponseConstant.ErrorMessage.ACCOUNT_NOT_VERIFIED, facebookUserInfo);
         } else {
@@ -242,7 +242,7 @@ public class AuthController {
                 if (facebookCover != null) {
                     customer.setCoverUrl(facebookCover.getSource());
                 }
-                customer = customerRespository.save(customer);
+                customer = customerRepository.save(customer);
                 user.setDataID(customer.getId());
                 user = userRepository.save(user);
             }
@@ -396,7 +396,7 @@ public class AuthController {
                                    @Valid @RequestBody NewPassword password) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(customerID);
+            Customer customer = customerRepository.findOne(customerID);
             if (customer == null) {
                 return new NotFoundResponse("Customer not Exist");
             }
@@ -422,7 +422,7 @@ public class AuthController {
             @Valid @RequestBody String email) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(customerID);
+            Customer customer = customerRepository.findOne(customerID);
             if(customer==null){
                 return new NotFoundResponse("Customer not Exist");
             }
@@ -466,7 +466,7 @@ public class AuthController {
     @ApiOperation(value = "Xuất excel ratting" , response = Iterable.class)
     @GetMapping("/exportCSVRatting")
     public Response createCSVRatting() throws IOException {
-        List<String> customerIDs = customerRespository.findAllID();
+        List<String> customerIDs = customerRepository.findAllID();
         List<String> listclotheIDs = clothesRepository.findAllID();
         listclotheIDs.add(0, "user");
         List<List<Object>> rowData= new ArrayList<>();
@@ -474,11 +474,11 @@ public class AuthController {
             List<Object> data= new ArrayList<>();
             data.add(i+1);
             for (int j = 1; j < listclotheIDs.size(); j++) {
-                RateClothes rateClothes= rateClothesRepository.findByClothes_IdAndCustomer_Id(listclotheIDs.get(j),customerIDs.get(i));
-                if(rateClothes==null){
+                Rating rating = rateClothesRepository.findByClothes_IdAndCustomer_Id(listclotheIDs.get(j),customerIDs.get(i));
+                if(rating ==null){
                     data.add(0);
                 }else {
-                    data.add(rateClothes.getRating());
+                    data.add(rating.getValue());
                 }
             }
             rowData.add(data);
@@ -538,8 +538,8 @@ public class AuthController {
             List<Object> customerList;
             while( (customerList = listReader.read(processors)) != null ) {
                 for (int i = 2; i < customerList.size(); i++) {
-                    RecommendClothes recommendClothes= new RecommendClothes(clothesRepository.findOne(customerList.get(0).toString()),clothesRepository.findOne(customerList.get(i).toString()),(i-1));
-                    recommendClothesRepository.save(recommendClothes);
+                    ClothesRecommend clothesRecommend = new ClothesRecommend(clothesRepository.findOne(customerList.get(0).toString()),clothesRepository.findOne(customerList.get(i).toString()),(i-1));
+                    recommendClothesRepository.save(clothesRecommend);
                 }
 
 //                RecommendItem recommendItem= new RecommendItem(customerList.get(0).toString(), customerList.get(2).toString(), customerList.get(3).toString(), customerList.get(4).toString(), customerList.get(5).toString());
@@ -556,9 +556,9 @@ public class AuthController {
     @ApiOperation(value = "Xuất excel ratting" , response = Iterable.class)
     @GetMapping("/exportRatting")
     public Response createExcelShareBill() throws IOException {
-        List<Customer> customers = customerRespository.findAll();
+        List<Customer> customers = customerRepository.findAll();
         List<Clothes> listclothes = clothesRepository.findAll();
-       // List<RateClothes> rates = rateClothesRepository.findAll();
+       // List<Rating> rates = rateClothesRepository.findAll();
         HSSFWorkbook workbook = new HSSFWorkbook();
         HSSFSheet sheet = workbook.createSheet("Ratting sheet");
         int rownum = 0;
@@ -579,11 +579,11 @@ public class AuthController {
             row = sheet.createRow(rownum);
             row.createCell(0, CellType.STRING).setCellValue(customer.getId());
             for (int i = 0; i < listclothes.size(); i++) {
-                RateClothes rateClothes= rateClothesRepository.findByClothes_IdAndCustomer_Id(listclothes.get(i).getId(), customer.getId());
-                if(rateClothes==null){
+                Rating rating = rateClothesRepository.findByClothes_IdAndCustomer_Id(listclothes.get(i).getId(), customer.getId());
+                if(rating ==null){
                     row.createCell(i+1, CellType.NUMERIC).setCellValue(0);
                 }else {
-                    row.createCell(i + 1, CellType.NUMERIC).setCellValue(rateClothes.getRating());
+                    row.createCell(i + 1, CellType.NUMERIC).setCellValue(rating.getValue());
                 }
             }
         }
@@ -604,7 +604,7 @@ public class AuthController {
         Response response;
         try {
 
-            List<Customer> customers = customerRespository.findAll();
+            List<Customer> customers = customerRepository.findAll();
 
             List<Clothes> listclothes = clothesRepository.findAll();
 
@@ -641,14 +641,14 @@ public class AuthController {
 
 
                 if(rateClothesRepository.existsByCustomerIdAndClothesId(customer.getId(),clothes.getId())){
-                    RateClothes rateClothes = rateClothesRepository.findByClothes_IdAndCustomer_Id(clothes.getId(),customer.getId());
-                    rateClothes.update(rateClothesBody);
-                    rateClothesRepository.save(rateClothes);
+                    Rating rating = rateClothesRepository.findByClothes_IdAndCustomer_Id(clothes.getId(),customer.getId());
+                    rating.update(rateClothesBody);
+                    rateClothesRepository.save(rating);
                 }else {
-                    RateClothes rateClothes = new RateClothes(rateClothesBody);
-                    rateClothes.setCustomer(customer);
-                    rateClothes.setClothes(clothes);
-                    rateClothesRepository.save(rateClothes);
+                    Rating rating = new Rating(rateClothesBody);
+                    rating.setCustomer(customer);
+                    rating.setClothes(clothes);
+                    rateClothesRepository.save(rating);
                 }
             }
 

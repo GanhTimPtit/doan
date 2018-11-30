@@ -1,9 +1,7 @@
 package com.ptit.edu.store.product.models.view;
 
 import com.ptit.edu.store.product.models.data.Clothes;
-import com.ptit.edu.store.product.models.data.RateClothes;
-
-import java.util.Date;
+import com.ptit.edu.store.product.models.data.Rating;
 
 public class ClothesPreview implements java.io.Serializable{
     private String id;
@@ -11,14 +9,14 @@ public class ClothesPreview implements java.io.Serializable{
     private int price;
     private String category;
     private String logoUrl;
-    private int numberSave;
-    private int numberAvageOfRate;
-    private float avarageOfRate = 0;
+    private Integer numberSave;
+    private Integer numberAvageOfRate;
+    private Float avarageOfRate;
 
     public ClothesPreview() {
     }
 
-    public ClothesPreview(String id, String name, int price, String category, String logoUrl, int numberSave, long sumRate, long countRate) {
+    public ClothesPreview(String id, String name, int price, String category, String logoUrl, Integer numberSave,long countRate, Long sumRate) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -26,37 +24,49 @@ public class ClothesPreview implements java.io.Serializable{
         this.logoUrl = logoUrl;
         this.numberSave = numberSave;
         this.numberAvageOfRate =(int) countRate;
-        this.avarageOfRate = (float) sumRate/countRate ;
+        if(this.numberAvageOfRate==0){
+            this.avarageOfRate=0.0f;
+        }else {
+            this.avarageOfRate = (float) sumRate / this.numberAvageOfRate;
+        }
     }
 
+    public ClothesPreview(String id, String name, int price, String category, String logoUrl, Integer numberSave, long countRate) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.category = category;
+        this.logoUrl = logoUrl;
+        this.numberSave = numberSave;
+        this.numberAvageOfRate = (int) countRate;
+    }
 
-
-    public int getNumberAvageOfRate() {
+    public Integer getNumberAvageOfRate() {
         return numberAvageOfRate;
     }
 
-    public void setNumberAvageOfRate(int numberAvageOfRate) {
+    public void setNumberAvageOfRate(Integer numberAvageOfRate) {
         this.numberAvageOfRate = numberAvageOfRate;
     }
 
-    public float getAvarageOfRate() {
+    public Float getAvarageOfRate() {
         return avarageOfRate;
     }
 
-    public void setAvarageOfRate(float avarageOfRate) {
+    public void setAvarageOfRate(Float avarageOfRate) {
         this.avarageOfRate = avarageOfRate;
     }
 
-    public float getAvarageOfRate(Clothes clothes) {
-        if(clothes.getRateClothes().size()==0){
-            return 0;
+    public Float getAvarageOfRate(Clothes clothes) {
+        if(clothes.getRatings().size()==0){
+            return 0.0f;
         }
         int sum = 0;
-        for (RateClothes rateClothes : clothes.getRateClothes()) {
-            sum += rateClothes.getRating();
+        for (Rating rating : clothes.getRatings()) {
+            sum += rating.getValue();
         }
-        setNumberAvageOfRate(clothes.getRateClothes().size());
-        return (float) sum / clothes.getRateClothes().size();
+        setNumberAvageOfRate(clothes.getRatings().size());
+        return (float) sum / clothes.getRatings().size();
     }
     public String getId() {
         return id;
@@ -98,11 +108,11 @@ public class ClothesPreview implements java.io.Serializable{
         this.logoUrl = logoUrl;
     }
 
-    public int getNumberSave() {
+    public Integer getNumberSave() {
         return numberSave;
     }
 
-    public void setNumberSave(int numberSave) {
+    public void setNumberSave(Integer numberSave) {
         this.numberSave = numberSave;
     }
 }

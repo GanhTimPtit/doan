@@ -2,7 +2,7 @@ package com.ptit.edu.store.customer.dao;
 
 
 import com.ptit.edu.store.customer.models.view.SaveClothesPreview;
-import com.ptit.edu.store.product.models.data.SaveClothes;
+import com.ptit.edu.store.product.models.data.ClothesSave;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 
-public interface SaveClothesRepository extends JpaRepository<SaveClothes, String>{
+public interface SaveClothesRepository extends JpaRepository<ClothesSave, String>{
 
     @Transactional
     @Modifying
@@ -20,7 +20,7 @@ public interface SaveClothesRepository extends JpaRepository<SaveClothes, String
 
 
     @Query("select new com.ptit.edu.store.customer.models.view.SaveClothesPreview(sc) " +
-            "from SaveClothes sc" +
+            "from ClothesSave sc" +
             " where sc.customer.id = ?1")
     Page<SaveClothesPreview> getAllSavedClothes(String customerID, Pageable pageable);
 

@@ -14,10 +14,9 @@ import com.ptit.edu.store.customer.dao.OrderRepository;
 import com.ptit.edu.store.product.dao.RateClothesRepository;
 import com.ptit.edu.store.product.models.body.RateClothesBody;
 import com.ptit.edu.store.product.models.data.Clothes;
-import com.ptit.edu.store.product.models.data.RateClothes;
-import com.ptit.edu.store.product.models.data.SaveClothes;
+import com.ptit.edu.store.product.models.data.ClothesSave;
+import com.ptit.edu.store.product.models.data.Rating;
 import com.ptit.edu.store.product.models.view.ClothesViewModel;
-import com.ptit.edu.store.product.models.view.RateClothesViewModel;
 import com.ptit.edu.store.response_model.*;
 import com.ptit.edu.store.utils.PageAndSortRequestBuilder;
 import io.swagger.annotations.Api;
@@ -27,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +41,7 @@ import java.util.Set;
 @CrossOrigin(origins = "*")
 public class CustomerController {
     @Autowired
-    CustomerRespository customerRespository;
+    CustomerRepository customerRepository;
     @Autowired
     FeedbackRepository feedbackRepository;
     @Autowired
@@ -60,14 +60,15 @@ public class CustomerController {
     private RateClothesRepository rateClothesRepository;
     @Autowired
     private ItemRepository itemRepository;
-
+    @Autowired
+    private LocationRepository locationRepository;
 
     @ApiOperation(value = "Lấy Lấy avatar + email + tên Khách hàng", response = Iterable.class)
     @GetMapping("/headerProfiles")
     public Response getHeaderProfile() {
         Response response;
         try {
-            HeaderProfile headerProfile = customerRespository.getHeaderProfile(getAuthenticatedCustomerID());
+            HeaderProfile headerProfile = customerRepository.getHeaderProfile(getAuthenticatedCustomerID());
             response = new OkResponse(headerProfile);
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,7 +81,7 @@ public class CustomerController {
     public Response getProfile() {
         Response response;
         try {
-            Profile profile = customerRespository.getProfile(getAuthenticatedCustomerID());
+            Profile profile = customerRepository.getProfile(getAuthenticatedCustomerID());
             response = new OkResponse(profile);
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,12 +95,12 @@ public class CustomerController {
     public Response updateProfile(@RequestBody ProfileBody profileBody) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not exist!");
             }
             customer.update(profileBody);
-            customerRespository.save(customer);
+            customerRepository.save(customer);
             Profile profile = new Profile(customer);
             response = new OkResponse(profile);
         } catch (Exception e) {
@@ -118,7 +119,7 @@ public class CustomerController {
         Response response;
 
         try {
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not existed!");
             }
@@ -138,7 +139,7 @@ public class CustomerController {
     public Response rateShop(@RequestBody RateBody rateBody) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not found");
             }
@@ -155,13 +156,13 @@ public class CustomerController {
     //Cap nhat mo ta
     @ApiOperation(value = "api Cập nhật mô tả khách hàng", response = Iterable.class)
     @PostMapping("/description")
-    public Response updateDescription( @RequestBody String description) {
+    public Response updateDescription(@RequestBody String description) {
         Response response;
         try {
-            if (customerRespository.findOne(getAuthenticatedCustomerID()) == null) {
+            if (customerRepository.findOne(getAuthenticatedCustomerID()) == null) {
                 return new NotFoundResponse("Customer not exist");
             }
-            customerRespository.updateDescription(getAuthenticatedCustomerID(), description);
+            customerRepository.updateDescription(getAuthenticatedCustomerID(), description);
             response = new OkResponse(description);
         } catch (Exception e) {
             e.printStackTrace();
@@ -170,11 +171,11 @@ public class CustomerController {
         return response;
     }
 
-    /**********************SaveClothes********************/
+    /**********************ClothesSave********************/
     @ApiOperation(value = "Api lấy toàn bộ sản phẩm đã lưu", response = Iterable.class)
     @GetMapping("/save_clothes")
-    public Response saveClothes(@ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là " + SaveClothes.SAVED_DATE)
-                                @RequestParam(value = "sortBy", defaultValue = SaveClothes.SAVED_DATE) String sortBy,
+    public Response saveClothes(@ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là " + ClothesSave.SAVED_DATE)
+                                @RequestParam(value = "sortBy", defaultValue = ClothesSave.SAVED_DATE) String sortBy,
                                 @ApiParam(name = "sortType", value = "Nhận (asc | desc), mặc định là desc")
                                 @RequestParam(value = "sortType", defaultValue = "desc") String sortType,
                                 @ApiParam(name = "pageIndex", value = "Index trang, mặc định là 0")
@@ -183,7 +184,7 @@ public class CustomerController {
                                 @RequestParam(value = "pageSize", required = false) Integer pageSize) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not Exist");
             }
@@ -206,7 +207,7 @@ public class CustomerController {
     public Response getDetailClothes(@PathVariable("id") String clothesID) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not Exist");
             }
@@ -215,7 +216,7 @@ public class CustomerController {
                 return new NotFoundResponse("Clothes not Exist");
             }
             ClothesViewModel clothesViewModel = clothesRepository.getClothesViewModel(clothesID);
-            Sort sort = PageAndSortRequestBuilder.createSortRequest(RateClothes.RATE_DATE, "desc");
+            Sort sort = PageAndSortRequestBuilder.createSortRequest(Rating.RATE_DATE, "desc");
 
             clothesViewModel.setRateClothesViewModels(rateClothesRepository.getAllRate(clothesID, sort));
             clothesViewModel.setIsSaved(saveClothesRepository.existsByCustomer_IdAndClothes_Id(getAuthenticatedCustomerID(), clothesID));
@@ -226,12 +227,13 @@ public class CustomerController {
         }
         return response;
     }
+
     @ApiOperation(value = "Api Lưu quần áo", response = Iterable.class)
     @PostMapping("/save_clothes/{id}")
     public Response saveClothes(@PathVariable("id") String clothesID) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not Exist");
             }
@@ -243,7 +245,7 @@ public class CustomerController {
             clothes.addSave();
             clothesRepository.save(clothes);
 
-            saveClothesRepository.save(new SaveClothes(clothes, customer));
+            saveClothesRepository.save(new ClothesSave(clothes, customer));
             response = new OkResponse();
         } catch (Exception e) {
             e.printStackTrace();
@@ -251,12 +253,13 @@ public class CustomerController {
         }
         return response;
     }
+
     /**********************rateClothes********************/
     @ApiOperation(value = "Api đánh giá sản phẩm", response = Iterable.class)
     @PutMapping("/rateClothes/{id}")
     public Response rateClothes(@PathVariable("id") String clothesID,
                                 @RequestBody RateClothesBody body) {
-        Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+        Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
         if (customer == null) {
             return new NotFoundResponse("Customer not Exist");
         }
@@ -265,21 +268,19 @@ public class CustomerController {
             return new NotFoundResponse("Clothes not Exist");
         }
 
-        if(rateClothesRepository.existsByCustomerIdAndClothesId(getAuthenticatedCustomerID(),clothesID)){
-            RateClothes rateClothes = rateClothesRepository.findByClothes_IdAndCustomer_Id(clothesID,getAuthenticatedCustomerID());
-            rateClothes.update(body);
-            rateClothesRepository.save(rateClothes);
-        }else {
-            RateClothes rateClothes = new RateClothes(body);
-            rateClothes.setCustomer(customer);
-            rateClothes.setClothes(clothes);
-            rateClothesRepository.save(rateClothes);
+        if (rateClothesRepository.existsByCustomerIdAndClothesId(getAuthenticatedCustomerID(), clothesID)) {
+            Rating rating = rateClothesRepository.findByClothes_IdAndCustomer_Id(clothesID, getAuthenticatedCustomerID());
+            rating.update(body);
+            rateClothesRepository.save(rating);
+        } else {
+            Rating rating = new Rating(body);
+            rating.setCustomer(customer);
+            rating.setClothes(clothes);
+            rateClothesRepository.save(rating);
         }
-//        Sort sort =
-//                PageAndSortRequestBuilder.createSortRequest(RateClothes.RATE_DATE,"desc");
-//        List<RateClothesViewModel> rateClothesViewModels = rateClothesRepository.getAllRate(clothesID,sort);
         return new OkResponse();
     }
+
     @ApiOperation(value = "Api hủy lưu sản phẩm", response = Iterable.class)
     @DeleteMapping("/save_clothes/{id}")
     public Response deleteSaveClothes(@PathVariable("id") String clothesID,
@@ -287,14 +288,14 @@ public class CustomerController {
                                       @RequestParam(value = "pageIndex", defaultValue = "0") Integer pageIndex,
                                       @ApiParam(name = "pageSize", value = "Kích thước trang, mặc định và tối đa là " + Constant.MAX_PAGE_SIZE)
                                       @RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                      @ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là : " + SaveClothes.SAVED_DATE)
-                                      @RequestParam(value = "pageIndex", defaultValue = SaveClothes.SAVED_DATE) String sortBy,
+                                      @ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là : " + ClothesSave.SAVED_DATE)
+                                      @RequestParam(value = "pageIndex", defaultValue = ClothesSave.SAVED_DATE) String sortBy,
                                       @ApiParam(name = "sortType", value = "Nhận asc|desc, mặc đính là desc")
                                       @RequestParam(value = "pageSize", required = false, defaultValue = "desc") String sortType) {
         Response response;
         try {
 
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not Exist");
             }
@@ -319,24 +320,26 @@ public class CustomerController {
         return response;
     }
 
-    //OrderCustomer
+    /***********************************************OrderCustomer*********************************/
     @ApiOperation(value = "Api tạo order cho khách hàng", response = Iterable.class)
     @PutMapping("/orders")
     public Response insertOrder(@RequestBody OrderBody orderBody) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not Exist");
             }
-            Set<Item> listItems= new HashSet<>();
-            OrderCustomer orderCustomer = new OrderCustomer(orderBody.getTotalCost(),orderBody.getPayments(),orderBody.getNameCustomer(),orderBody.getPhone(), orderBody.getLocation(), customer);
-            for(ItemBody itemBody :orderBody.getItemBodySet()){
+            Location location = new Location(orderBody.getLocation(), orderBody.getLat(), orderBody.getLog());
+            location = locationRepository.save(location);
+            OrderCustomer orderCustomer = new OrderCustomer(orderBody.getTotalCost(), orderBody.getPayments(), orderBody.getNameCustomer(), orderBody.getPhone(), location, customer);
+            Set<Item> listItems = new HashSet<>();
+            for (ItemBody itemBody : orderBody.getItemBodySet()) {
                 Clothes clothes = clothesRepository.findOne(itemBody.getClothesID());
-                Item item= new Item(orderCustomer, clothes, itemBody.getColor(), itemBody.getSize(), itemBody.getAmount(), itemBody.getPrice() );
+                Item item = new Item(orderCustomer, clothes, itemBody.getColor(), itemBody.getSize(), itemBody.getAmount(), itemBody.getPrice());
                 listItems.add(item);
             }
-            if(listItems.size()>0){
+            if (listItems.size() > 0) {
                 orderCustomer.setItems(listItems);
                 orderRepository.save(orderCustomer);
             }
@@ -348,26 +351,26 @@ public class CustomerController {
         return response;
     }
 
-    @ApiOperation(value = "Lay tat ca cac don dat hang cua khach hang")
-    @GetMapping("/orders")
-    public Response getAllOrder(@ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là : " + OrderCustomer.CREATED_DATE)
-                                @RequestParam(value = "pageIndex", defaultValue = OrderCustomer.CREATED_DATE) String sortBy,
-                                @ApiParam(name = "sortType", value = "Nhận asc|desc, mặc đính là desc")
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "desc") String sortType,
-                                @ApiParam(name = "pageIndex", value = "index trang, mặc định là 0")
-                                @RequestParam(value = "pageIndex", defaultValue = "0") Integer pageIndex,
-                                @ApiParam(name = "pageSize", value = "Kích thước trang, mặc định và tối đa là " + Constant.MAX_PAGE_SIZE)
-                                @RequestParam(value = "pageSize", required = false) Integer pageSize
+    @ApiOperation(value = "Lay tat ca cac don dat hang cua khach hang với trạng thái xác nhận, đang giao")
+    @PostMapping("/orders/{status}")
+    public Response getPageOrder(@PathVariable("status") int status,
+                                 @ApiParam(name = "pageIndex", value = "index trang, mặc định là 0")
+                                 @RequestParam(value = "pageIndex", defaultValue = "0") Integer pageIndex,
+                                 @ApiParam(name = "pageSize", value = "Kích thước trang, mặc định và tối đa là " + Constant.MAX_PAGE_SIZE)
+                                 @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                 @ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là : " + OrderCustomer.CREATED_DATE)
+                                 @RequestParam(value = "sortBy", defaultValue = OrderCustomer.CREATED_DATE) String sortBy,
+                                 @ApiParam(name = "sortType", value = "Nhận asc|desc, mặc đính là desc")
+                                 @RequestParam(value = "sortType", required = false, defaultValue = "desc") String sortType
     ) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not Exist");
             }
-            Pageable pageable = PageAndSortRequestBuilder.createPageRequest(pageIndex, pageSize, "createdDate", sortType, Constant.MAX_PAGE_SIZE);
-            Page<OrderPreview> orderPreviews = orderRepository.getAllOrderPreview( customer.getId(),pageable);
-
+            Pageable pageable = PageAndSortRequestBuilder.createPageRequest(pageIndex, pageSize, sortBy, sortType, Constant.MAX_PAGE_SIZE);
+            Page<OrderPreview> orderPreviews = orderRepository.getPageOrderPreview(customer.getId(), status, pageable);
             response = new OkResponse(orderPreviews);
         } catch (Exception e) {
             e.printStackTrace();
@@ -375,26 +378,43 @@ public class CustomerController {
         }
         return response;
     }
-    @ApiOperation(value = "Lay tat ca cac don dat hang cua khach hang")
-    @GetMapping("/orders/{oid}/closthes")
-    public Response getAllOrderProduct(@PathVariable("oid") String orderID,
-                                @ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là : " + OrderCustomer.CREATED_DATE)
-                                @RequestParam(value = "pageIndex", defaultValue = OrderCustomer.CREATED_DATE) String sortBy,
-                                @ApiParam(name = "sortType", value = "Nhận asc|desc, mặc đính là desc")
-                                @RequestParam(value = "pageSize", required = false, defaultValue = "desc") String sortType,
-                                @ApiParam(name = "pageIndex", value = "index trang, mặc định là 0")
-                                @RequestParam(value = "pageIndex", defaultValue = "0") Integer pageIndex,
-                                @ApiParam(name = "pageSize", value = "Kích thước trang, mặc định và tối đa là " + Constant.MAX_PAGE_SIZE)
-                                @RequestParam(value = "pageSize", required = false) Integer pageSize
-    ) {
+
+    @ApiOperation(value = "Lay tat ca cac don dat hang cua khach hang với trạng thái thành công, thất bại")
+    @GetMapping("/orders/complete")
+    public Response getPageOrderComplete(@ApiParam(name = "pageIndex", value = "index trang, mặc định là 0")
+                                         @RequestParam(value = "pageIndex", defaultValue = "0") Integer pageIndex,
+                                         @ApiParam(name = "pageSize", value = "Kích thước trang, mặc định và tối đa là " + Constant.MAX_PAGE_SIZE)
+                                         @RequestParam(value = "pageSize", required = false) Integer pageSize,
+                                         @ApiParam(name = "sortBy", value = "Trường cần sort, mặc định là : " + OrderCustomer.CREATED_DATE)
+                                         @RequestParam(value = "sortBy", defaultValue = OrderCustomer.CREATED_DATE) String sortBy,
+                                         @ApiParam(name = "sortType", value = "Nhận asc|desc, mặc đính là desc")
+                                         @RequestParam(value = "sortType", required = false, defaultValue = "desc") String sortType) {
         Response response;
         try {
-            Customer customer = customerRespository.findOne(getAuthenticatedCustomerID());
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
             if (customer == null) {
                 return new NotFoundResponse("Customer not Exist");
             }
-           // Pageable pageable = PageAndSortRequestBuilder.createPageRequest(pageIndex, pageSize, OrderCustomer.CREATED_DATE, "desc", Constant.MAX_PAGE_SIZE);
-            List<ItemPreview> itemPreviews = itemRepository.getItemPreview(orderID,customer.getId());
+            Pageable pageable = PageAndSortRequestBuilder.createPageRequest(pageIndex, pageSize, sortBy, sortType, Constant.MAX_PAGE_SIZE);
+            Page<OrderPreview> orderPreviews = orderRepository.getPageOrderPreview(customer.getId(), pageable);
+            response = new OkResponse(orderPreviews);
+        } catch (Exception e) {
+            e.printStackTrace();
+            response = new ServerErrorResponse();
+        }
+        return response;
+    }
+
+    @ApiOperation(value = "Lay chi tiết don dat hang cua khach hang")
+    @GetMapping("/orders/{oid}")
+    public Response getAllDetailOrderProduct(@PathVariable("oid") String orderID) {
+        Response response;
+        try {
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
+            if (customer == null) {
+                return new NotFoundResponse("Customer not Exist");
+            }
+            List<ItemPreview> itemPreviews = itemRepository.getItemPreview(orderID, customer.getId());
             response = new OkResponse(itemPreviews);
         } catch (Exception e) {
             e.printStackTrace();
@@ -402,6 +422,29 @@ public class CustomerController {
         }
         return response;
     }
+
+    @ApiOperation(value = "Hủy don dat hang cua khach hang")
+    @DeleteMapping("/orders/{oid}")
+    public Response deleteOrderProduct(@PathVariable("oid") String orderID) {
+        Response response;
+        try {
+            Customer customer = customerRepository.findOne(getAuthenticatedCustomerID());
+            if (customer == null) {
+                return new NotFoundResponse("Customer not Exist");
+            }
+            if (!orderRepository.existsByIdAndStatus(orderID, 0)) {
+                return new ForbiddenResponse("Đơn hàng này đã được phê duyệt, bạn không thể xóa");
+            }
+            orderRepository.delete(orderID);
+            response = new OkResponse();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response = new ServerErrorResponse();
+        }
+        return response;
+    }
+
+    /*********************************************************************************************************/
     private String getAuthenticatedCustomerID() {
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         return userRepository.getDataIDWithUsername(userEmail);

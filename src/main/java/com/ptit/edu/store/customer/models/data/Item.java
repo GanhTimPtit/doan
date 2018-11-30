@@ -6,14 +6,14 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "bill_product")
+@Table(name = "item")
 public class Item {
     public  static final String CLOTHES = "clothes";
     @Id
     @GenericGenerator(name = "uuid", strategy = "uuid2")
     @GeneratedValue(generator = "uuid")
     private String id;
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "clothesID")
     private Clothes clothes;
     @ManyToOne(fetch = FetchType.EAGER)

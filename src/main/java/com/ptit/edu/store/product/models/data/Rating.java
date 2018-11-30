@@ -9,8 +9,8 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "rate_clothes")
-public class RateClothes {
+@Table(name = "rating")
+public class Rating {
     public static final String RATE_DATE = "rateDate";
     @Id
     @GenericGenerator(name = "uuid", strategy = "uuid2")
@@ -24,21 +24,21 @@ public class RateClothes {
     private Customer customer;
     private Date rateDate;
     private String message;
-    private int rating;
+    private int value;
 
-    public RateClothes() {
+    public Rating() {
     }
 
-    public RateClothes(RateClothesBody body) {
+    public Rating(RateClothesBody body) {
         this.rateDate = new Date();
         this.message = body.getMessage();
-        this.rating = body.getRating();
+        this.value = body.getRating();
     }
 
     public void update(RateClothesBody body){
         this.rateDate = new Date();
         this.message = body.getMessage();
-        this.rating = body.getRating();
+        this.value = body.getRating();
     }
     public String getId() {
         return id;
@@ -80,11 +80,11 @@ public class RateClothes {
         this.message = message;
     }
 
-    public int getRating() {
-        return rating;
+    public int getValue() {
+        return value;
     }
 
-    public void setRating(int rating) {
-        this.rating = rating;
+    public void setValue(int value) {
+        this.value = value;
     }
 }

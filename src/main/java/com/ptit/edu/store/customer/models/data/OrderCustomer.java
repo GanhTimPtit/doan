@@ -20,7 +20,6 @@ public class OrderCustomer {
     private String payments;
     private String nameCustomer;
     private String phone;
-    private String location;
     private int status;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -30,8 +29,11 @@ public class OrderCustomer {
     @OneToMany(mappedBy = "orderCustomer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Item> items;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "locationID")
+    private Location location;
 
-    public OrderCustomer(int totalPrice, String payments, String nameCustomer, String phone, String location, Customer customer) {
+    public OrderCustomer(int totalPrice, String payments, String nameCustomer, String phone, Location location, Customer customer) {
         this.totalPrice = totalPrice;
         this.payments = payments;
         this.nameCustomer = nameCustomer;
@@ -129,11 +131,11 @@ public class OrderCustomer {
         this.phone = phone;
     }
 
-    public String getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 

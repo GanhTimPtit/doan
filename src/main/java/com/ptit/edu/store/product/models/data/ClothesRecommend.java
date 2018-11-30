@@ -6,8 +6,8 @@ import org.hibernate.annotations.GenericGenerator;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "recommend_clothes")
-public class RecommendClothes {
+@Table(name = "clothes_recommend")
+public class ClothesRecommend {
     public static final String PRIORITY = "priority";
     @Id
     @GenericGenerator(name = "uuid", strategy = "uuid2")
@@ -21,10 +21,10 @@ public class RecommendClothes {
     private Clothes clothesRecommend;
     private int priority;
 
-    public RecommendClothes() {
+    public ClothesRecommend() {
     }
 
-    public RecommendClothes(Clothes clothes, Clothes clothesRecommend, int priority) {
+    public ClothesRecommend(Clothes clothes, Clothes clothesRecommend, int priority) {
         this.clothes = clothes;
         this.clothesRecommend = clothesRecommend;
         this.priority = priority;

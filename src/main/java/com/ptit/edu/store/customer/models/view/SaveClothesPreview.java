@@ -1,6 +1,6 @@
 package com.ptit.edu.store.customer.models.view;
 
-import com.ptit.edu.store.product.models.data.SaveClothes;
+import com.ptit.edu.store.product.models.data.ClothesSave;
 
 public class SaveClothesPreview {
     private String id;
@@ -12,12 +12,12 @@ public class SaveClothesPreview {
     public SaveClothesPreview() {
     }
 
-    public SaveClothesPreview(SaveClothes saveClothes) {
-        setId(saveClothes.getClothes().getId());
-        setName(saveClothes.getClothes().getName());
-        setLogoUrl(saveClothes.getClothes().getLogoUrl());
-        setPrice(saveClothes.getClothes().getPrice());
-        setSaveDate(saveClothes.getSaveDate().getTime());
+    public SaveClothesPreview(ClothesSave clothesSave) {
+        setId(clothesSave.getClothes().getId());
+        setName(clothesSave.getClothes().getName());
+        setLogoUrl(clothesSave.getClothes().getLogoUrl());
+        setPrice(clothesSave.getClothes().getPrice());
+        setSaveDate(clothesSave.getSaveDate().getTime());
     }
 
     public String getId() {

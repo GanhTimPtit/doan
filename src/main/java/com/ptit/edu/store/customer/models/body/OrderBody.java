@@ -6,6 +6,8 @@ public class OrderBody {
     private String nameCustomer;
     private String phone;
     private String location;
+    private double lat;
+    private double log;
     private String payments;
     private int totalCost;
     private Set<ItemBody> itemBodySet;
@@ -13,10 +15,12 @@ public class OrderBody {
     public OrderBody() {
     }
 
-    public OrderBody(String nameCustomer, String phone, String location, String payments, int totalCost, Set<ItemBody> itemBodySet) {
+    public OrderBody(String nameCustomer, String phone, String location, double lat, double log, String payments, int totalCost, Set<ItemBody> itemBodySet) {
         this.nameCustomer = nameCustomer;
         this.phone = phone;
         this.location = location;
+        this.lat= lat;
+        this.log= log;
         this.payments = payments;
         this.totalCost = totalCost;
         this.itemBodySet = itemBodySet;
@@ -68,5 +72,21 @@ public class OrderBody {
 
     public void setTotalCost(int totalCost) {
         this.totalCost = totalCost;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLog() {
+        return log;
+    }
+
+    public void setLog(double log) {
+        this.log = log;
     }
 }

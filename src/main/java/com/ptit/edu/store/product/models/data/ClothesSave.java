@@ -7,8 +7,8 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "save_clothes")
-public class SaveClothes {
+@Table(name = "clothes_save")
+public class ClothesSave {
     public final static String SAVED_DATE = "saveDate";
     public final static String CLOTHES = "CLOTHES";
     @Id
@@ -23,10 +23,10 @@ public class SaveClothes {
     private Customer customer;
     private Date saveDate;
 
-    public SaveClothes() {
+    public ClothesSave() {
     }
 
-    public SaveClothes(Clothes clothes, Customer customer) {
+    public ClothesSave(Clothes clothes, Customer customer) {
         this.clothes = clothes;
         this.customer = customer;
         this.saveDate= new Date();

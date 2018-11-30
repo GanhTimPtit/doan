@@ -7,9 +7,13 @@ public class ConfirmOrderPreview {
     private Long createdDate;
     private String nameCustomer;
     private String phone;
-    private String location;
+    private String locationName;
+    private double lat;
+    private double log;
     private Integer totalCost;
     private String logoAvatar;
+    private int status;
+    private String customerID;
 
     public ConfirmOrderPreview() {
     }
@@ -18,16 +22,24 @@ public class ConfirmOrderPreview {
                                Date createdDate,
                                String nameCustomer,
                                String phone,
-                               String location,
+                               String locationName,
+                               double lat,
+                               double log,
                                Integer totalCost,
-                               String logoAvatar) {
+                               String logoAvatar,
+                               int status,
+                               String customerID) {
         this.id = id;
         this.createdDate = createdDate.getTime();
         this.nameCustomer = nameCustomer;
         this.phone = phone;
-        this.location = location;
+        this.locationName = locationName;
+        this.lat= lat;
+        this.log= log;
         this.totalCost = totalCost;
         this.logoAvatar= logoAvatar;
+        this.status= status;
+        this.customerID= customerID;
     }
 
 
@@ -55,12 +67,28 @@ public class ConfirmOrderPreview {
         this.phone = phone;
     }
 
-    public String getLocation() {
-        return location;
+    public String getLocationName() {
+        return locationName;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLog() {
+        return log;
+    }
+
+    public void setLog(double log) {
+        this.log = log;
     }
 
     public Integer getTotalCost() {
@@ -85,5 +113,21 @@ public class ConfirmOrderPreview {
 
     public void setLogoAvatar(String logoAvatar) {
         this.logoAvatar = logoAvatar;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public String getCustomerID() {
+        return customerID;
+    }
+
+    public void setCustomerID(String customerID) {
+        this.customerID = customerID;
     }
 }

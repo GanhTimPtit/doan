@@ -1,6 +1,6 @@
 package com.ptit.edu.store.product.models.view;
 
-import com.ptit.edu.store.product.models.data.RateClothes;
+import com.ptit.edu.store.product.models.data.Rating;
 
 import java.util.Date;
 
@@ -19,12 +19,12 @@ public class RateClothesViewModel {
         this.rating = rating;
     }
 
-    public RateClothesViewModel(RateClothes rateClothes) {
-        this.customerName = rateClothes.getCustomer().getFirstName()+" "+rateClothes.getCustomer().getLastName();
-        this.logoUrl = rateClothes.getCustomer().getAvatarUrl();
-        this.rateDate = rateClothes.getRateDate().getTime();
-        this.message = rateClothes.getMessage();
-        this.rating = rateClothes.getRating();
+    public RateClothesViewModel(Rating rating) {
+        this.customerName = rating.getCustomer().getFirstName()+" "+ rating.getCustomer().getLastName();
+        this.logoUrl = rating.getCustomer().getAvatarUrl();
+        this.rateDate = rating.getRateDate().getTime();
+        this.message = rating.getMessage();
+        this.rating = rating.getValue();
     }
 
     public RateClothesViewModel() {

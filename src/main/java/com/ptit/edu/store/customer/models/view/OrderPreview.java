@@ -1,27 +1,19 @@
 package com.ptit.edu.store.customer.models.view;
 
-import com.ptit.edu.store.customer.models.data.Item;
-import com.ptit.edu.store.customer.models.data.OrderCustomer;
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 public class OrderPreview {
     private String id;
     private Long createdDate;
-    private Integer amount;
     private String nameCustomer;
     private String phone;
     private String location;
     private String payments;
     private Integer totalCost;
-    private Set<ItemPreview> itemPreviews;
+    private int status;
 
     public OrderPreview() {
     }
-
 
 
     public OrderPreview(String id,
@@ -31,7 +23,7 @@ public class OrderPreview {
                         String location,
                         String payments,
                         int totalCost,
-                        Set<Item> items) {
+                        int status) {
         this.id = id;
         this.createdDate = createdDate.getTime();
         this.nameCustomer = nameCustomer;
@@ -39,53 +31,9 @@ public class OrderPreview {
         this.location = location;
         this.payments = payments;
         this.totalCost = totalCost;
-        itemPreviews= new HashSet<>();
-        for (Item item: items) {
-            itemPreviews.add(new ItemPreview(item.getClothes().getId(),item.getClothes().getLogoUrl(), item.getClothes().getName(), item.getColor(), item.getSize(), item.getAmount(),item.getPrice()));
-        }
-        this.amount = itemPreviews.size();
-
+        this.status= status;
     }
 
-    public OrderPreview(String id,
-                        Date createdDate,
-                        String nameCustomer,
-                        String phone,
-                        String location,
-                        String payments,
-                        Integer totalCost) {
-        this.id = id;
-        this.createdDate = createdDate.getTime();
-//        this.amount = itemPreviews.size();
-        this.nameCustomer = nameCustomer;
-        this.phone = phone;
-        this.location = location;
-        this.payments = payments;
-        this.totalCost = totalCost;
-    }
-
-    public OrderPreview(OrderCustomer orderCustomer) {
-        setId(orderCustomer.getId());
-        setTotalCost(orderCustomer.getTotalPrice());
-        setNameCustomer(orderCustomer.getNameCustomer());
-        setPhone(orderCustomer.getPhone());
-        setLocation(orderCustomer.getLocation());
-        setPayments(orderCustomer.getPayments());
-        setCreatedDate(orderCustomer.getCreatedDate().getTime());
-        setAmount(orderCustomer.getItems().size());
-        itemPreviews= new HashSet<>();
-        for (Item item: orderCustomer.getItems()) {
-            itemPreviews.add(new ItemPreview(item.getClothes().getId(),item.getClothes().getLogoUrl(), item.getClothes().getName(), item.getColor(), item.getSize(), item.getAmount(),item.getPrice()));
-        }
-    }
-
-    public Integer getAmount() {
-        return amount;
-    }
-
-    public void setAmount(Integer amount) {
-        this.amount = amount;
-    }
 
     public String getId() {
         return id;
@@ -143,11 +91,11 @@ public class OrderPreview {
         this.createdDate = createdDate;
     }
 
-    public Set<ItemPreview> getItemPreviews() {
-        return itemPreviews;
+    public int getStatus() {
+        return status;
     }
 
-    public void setItemPreviews(Set<ItemPreview> itemPreviews) {
-        this.itemPreviews = itemPreviews;
+    public void setStatus(int status) {
+        this.status = status;
     }
 }

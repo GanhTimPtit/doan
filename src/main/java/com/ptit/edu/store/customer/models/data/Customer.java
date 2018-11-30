@@ -3,10 +3,12 @@ package com.ptit.edu.store.customer.models.data;
 import com.ptit.edu.store.auth.models.body.CustomerRegisterBody;
 import com.ptit.edu.store.auth.models.data.User;
 import com.ptit.edu.store.customer.models.body.ProfileBody;
+import com.ptit.edu.store.product.models.data.Rating;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "customer")
@@ -31,6 +33,12 @@ public class Customer {
     @OneToOne(fetch = FetchType.EAGER, cascade=CascadeType.ALL)
     @JoinColumn(name = "userID")
     private User user;
+
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Rating> ratings;
+
+    @OneToMany(mappedBy = "customer", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<OrderCustomer> orderCustomers;
 
     public String getEmail() {
         return email;
@@ -160,5 +168,21 @@ public class Customer {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Set<Rating> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(Set<Rating> ratings) {
+        this.ratings = ratings;
+    }
+
+    public Set<OrderCustomer> getOrderCustomers() {
+        return orderCustomers;
+    }
+
+    public void setOrderCustomers(Set<OrderCustomer> orderCustomers) {
+        this.orderCustomers = orderCustomers;
     }
 }

@@ -4,9 +4,21 @@ import java.util.Date;
 
 public class ClothesBody {
     private String name;
-    private int price;
-    private String description;
     private String logoUrl;
+    private String categoryID;
+    private int cost;
+    private String description;
+
+    public ClothesBody() {
+    }
+
+    public ClothesBody(String name, String logoUrl, String categoryID, int cost, String description) {
+        this.name = name;
+        this.logoUrl = logoUrl;
+        this.categoryID = categoryID;
+        this.cost = cost;
+        this.description = description;
+    }
 
     public String getName() {
         return name;
@@ -16,12 +28,28 @@ public class ClothesBody {
         this.name = name;
     }
 
-    public int getPrice() {
-        return price;
+    public String getLogoUrl() {
+        return logoUrl;
     }
 
-    public void setPrice(int price) {
-        this.price = price;
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
+    }
+
+    public String getCategoryID() {
+        return categoryID;
+    }
+
+    public void setCategoryID(String categoryID) {
+        this.categoryID = categoryID;
+    }
+
+    public int getCost() {
+        return cost;
+    }
+
+    public void setCost(int cost) {
+        this.cost = cost;
     }
 
     public String getDescription() {
@@ -30,14 +58,6 @@ public class ClothesBody {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getLogoUrl() {
-        return logoUrl;
-    }
-
-    public void setLogoUrl(String logoUrl) {
-        this.logoUrl = logoUrl;
     }
 
 

@@ -1,6 +1,7 @@
 package com.ptit.edu.store.product.models.data;
 
 
+import com.ptit.edu.store.customer.models.data.Item;
 import com.ptit.edu.store.product.models.body.ClothesBody;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -28,14 +29,16 @@ public class Clothes {
     private Category category;
 
     @OneToMany(mappedBy = "clothes", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<RateClothes> rateClothes;
+    private Set<Rating> ratings;
 
+    @OneToMany(mappedBy = "clothes", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<Item> items;
     public Clothes() {
     }
 
     public Clothes(ClothesBody body) {
         this.name = body.getName();
-        this.price = body.getPrice();
+        this.price = body.getCost();
         this.description = body.getDescription();
         this.logoUrl = body.getLogoUrl();
         this.totalSave = 0;
@@ -76,14 +79,12 @@ public class Clothes {
         this.logoUrl = logoUrl;
     }
 
-
-
-    public Set<RateClothes> getRateClothes() {
-        return rateClothes;
+    public Set<Rating> getRatings() {
+        return ratings;
     }
 
-    public void setRateClothes(Set<RateClothes> rateClothes) {
-        this.rateClothes = rateClothes;
+    public void setRatings(Set<Rating> ratings) {
+        this.ratings = ratings;
     }
 
     public int getPrice() {
@@ -108,6 +109,14 @@ public class Clothes {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public Set<Item> getItems() {
+        return items;
+    }
+
+    public void setItems(Set<Item> items) {
+        this.items = items;
     }
 
     public int getTotalSave() {

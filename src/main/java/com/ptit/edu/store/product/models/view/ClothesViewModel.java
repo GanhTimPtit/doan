@@ -1,14 +1,8 @@
 package com.ptit.edu.store.product.models.view;
 
 import com.ptit.edu.store.product.models.data.Category;
-import com.ptit.edu.store.product.models.data.Clothes;
-import com.ptit.edu.store.product.models.data.RateClothes;
 
-import javax.persistence.*;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ClothesViewModel {
     private String id;

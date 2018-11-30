@@ -5,13 +5,19 @@ public class HeaderProfile {
     private String fullName;
     private String avatarUrl;
     private String email;
-
-    public HeaderProfile(String customerID, String fullName, String avatarUrl,String email) {
+    private String phone;
+    public HeaderProfile(String firstName, String lastName,String customerID, String avatarUrl,String email, String phone) {
+        this.fullName = firstName+" "+lastName;
         this.customerID = customerID;
-        this.fullName = fullName;
         this.avatarUrl = avatarUrl;
         this.email = email;
+        this.phone= phone;
     }
+
+    public HeaderProfile() {
+
+    }
+
 
     public String getEmail() {
         return email;
@@ -46,14 +52,11 @@ public class HeaderProfile {
         this.avatarUrl = avatarUrl;
     }
 
-    public HeaderProfile(String firstName, String lastName,String customerID, String avatarUrl,String email) {
-        this.fullName = firstName+" "+lastName;
-        this.customerID = customerID;
-        this.avatarUrl = avatarUrl;
-        this.email = email;
+    public String getPhone() {
+        return phone;
     }
 
-    public HeaderProfile() {
-
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }

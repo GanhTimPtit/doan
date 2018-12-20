@@ -25,7 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
-@Api(value = "candidate-api", description = "Nhóm API Customer, Yêu cầu access token của Khách hàng")
+@Api(value = "Product-api", description = "Nhóm API Product")
 @CrossOrigin(origins = "*")
 public class ProductController {
 

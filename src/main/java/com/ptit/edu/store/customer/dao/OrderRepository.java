@@ -24,7 +24,7 @@ public interface OrderRepository extends JpaRepository<OrderCustomer, String> {
     @Query("select new com.ptit.edu.store.customer.models.view.OrderPreview(o.id, o.createdDate, o.nameCustomer,o.phone, l.name,"+
             "o.payments, o.totalPrice, o.status)" +
             " from OrderCustomer o join o.customer cs join o.location l " +
-            "where cs.id= ?1 and o.status=1 or o.status=2 or o.status=3")
+            "where o.status <>0 and o.status <>4 and cs.id= ?1")
     Page<OrderPreview> getPageOrderPreview(String customerID, Pageable pageable);
 
     @Query("select sum(o.totalPrice)" +

@@ -98,7 +98,7 @@ public class AuthController {
             } else {
                 u.setRole(RoleConstants.CUSTOMER);
                 u.setPassword(bCryptPasswordEncoder.encode(u.getPassword()));
-                u.setActived(false);
+                u.setActived(true);
                 Customer customer = new Customer();
                 customer.updatecontruct(u, customerRegisterBody);
                 customer = customerRepository.save(customer);
